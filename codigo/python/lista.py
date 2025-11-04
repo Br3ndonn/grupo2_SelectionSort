@@ -13,7 +13,7 @@ class Lista:
         else:
             self.elementos = list(elementos)
     
-    def __len__(self):
+    def tamanho(self):
         """Retorna o tamanho da lista"""
         return len(self.elementos)
     
@@ -40,22 +40,3 @@ class Lista:
     def limpar(self):
         """Limpa a lista"""
         self.elementos = []
-
-
-class Array:
-    """Classe Array (mantida para compatibilidade)"""
-    
-    def __init__(self, elements):
-        self.elements = elements
-
-    def __len__(self):
-        return len(self.elements)
-
-    def __getitem__(self, index):
-        return self.elements[index]
-
-    def __setitem__(self, index, value):
-        self.elements[index] = value
-
-    def __repr__(self):
-        return f"Array({self.elements})"
