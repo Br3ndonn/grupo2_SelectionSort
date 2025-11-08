@@ -1,0 +1,12 @@
+diretorio dados
+/dados/*
+/python/__pycache__/
+/python/teste.py
+/python/gerador.py
+codigo/python/teste.py
+codigo/python/experimento.py
+/.idea/
+/python/__pycache__/
+codigo/python/__pycache__/carrega_lista.cpython-313.pyc
+codigo/python/__pycache__/lista.cpython-313.pyc
+codigo/python/__pycache__/selection_sort.cpython-313.pyc

@@ -10,9 +10,10 @@ def selection_sort(lista: Lista) -> Lista:
     Returns:
         Lista ordenada
     """
-    for i in range(lista.tamanho()):
+    n = lista.tamanho()
+    for i in range(n):
         min_index = i
-        for j in range(i + 1, lista.tamanho()):
+        for j in range(i + 1, n):
             if lista[j] < lista[min_index]:
                 min_index = j
         if(i != min_index):
