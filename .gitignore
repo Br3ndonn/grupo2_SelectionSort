@@ -10,3 +10,11 @@ codigo/python/experimento.py
 codigo/python/__pycache__/carrega_lista.cpython-313.pyc
 codigo/python/__pycache__/lista.cpython-313.pyc
 codigo/python/__pycache__/selection_sort.cpython-313.pyc
+codigo/c/main.exe
+executar_todos.sh
+.gitignore
+executar_todos.bat
+COMO_EXECUTAR.md
+codigo/README.md
+executar_todos.ps1
+codigo/python/__pycache__/main.cpython-313.pyc
