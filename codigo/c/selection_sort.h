@@ -3,9 +3,6 @@
 
 #include "lista.h"
 
-/**
- * Ordena a lista usando o algoritmo Selection Sort (in-place)
- */
-void selection_sort(Lista* lista);
+void selection_sort(int* arr, int n);
 
 #endif

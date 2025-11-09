@@ -47,15 +47,17 @@ double calcular_desvio(double* valores, int n, double media) {
 }
 
 // Executa experimento: carrega CSV e mede tempo de ordenação
+// Usa array C puro para comparação justa com Python
 double executar_experimento(const char* caminho_csv) {
-    Lista* lista = carregar_csv(caminho_csv);
-    if (!lista) return -1.0;
+    int tamanho;
+    int* arr = carregar_csv(caminho_csv, &tamanho);
+    if (!arr) return -1.0;
     
     double t_inicio = obter_tempo();
-    selection_sort(lista);
+    selection_sort(arr, tamanho);
     double t_fim = obter_tempo();
     
-    lista_destruir(lista);
+    free(arr);
     return (t_fim - t_inicio) * 1000.0;  // Retorna em milissegundos
 }
 
