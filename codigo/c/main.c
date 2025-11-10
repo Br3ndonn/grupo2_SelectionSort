@@ -1,6 +1,3 @@
-#include "lista.h"
-#include "selection_sort.h"
-#include "carrega_csv.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +11,73 @@
 #include <sys/stat.h>
 #endif
 
-// Função simples para obter tempo em segundos
+// --- Prototypes (declarações) seguindo boas práticas ---
+void selection_sort(int* restrict arr, int n);
+int* carregar_csv(const char* caminho, int* tamanho);
+double obter_tempo(void);
+double calcular_media(double* valores, int n);
+double calcular_desvio(double* valores, int n, double media);
+double executar_experimento(const char* caminho_csv);
+
+void selection_sort(int* restrict arr, int n) {
+    for (int i = 0; i < n; i++) {
+        int min_index = i;
+        
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[min_index]) {
+                min_index = j;
+            }
+        }
+        
+        if (min_index != i) {
+            int temp = arr[min_index];
+            arr[min_index] = arr[i];
+            arr[i] = temp;
+        }
+    }
+}
+
+int* carregar_csv(const char* caminho, int* tamanho) {
+    FILE* arquivo = fopen(caminho, "rb");
+    if (!arquivo) return NULL;
+    
+    fseek(arquivo, 0, SEEK_END);
+    long file_size = ftell(arquivo);
+    fseek(arquivo, 0, SEEK_SET);
+    
+    char* buffer = (char*)malloc(file_size + 1);
+    if (!buffer) {
+        fclose(arquivo);
+        return NULL;
+    }
+    
+    size_t bytes_read = fread(buffer, 1, file_size, arquivo);
+    fclose(arquivo);
+    buffer[bytes_read] = '\0';
+    
+    int count = 1;
+    for (size_t i = 0; i < bytes_read; i++) {
+        if (buffer[i] == ',') count++;
+    }
+    
+    int* arr = (int*)malloc(count * sizeof(int));
+    if (!arr) {
+        free(buffer);
+        return NULL;
+    }
+    
+    char* ptr = buffer;
+    for (int i = 0; i < count; i++) {
+        arr[i] = (int)strtol(ptr, &ptr, 10);
+        ptr++;  // Pula vírgula
+    }
+    
+    free(buffer);
+    *tamanho = count;
+    return arr;
+}
+
+// obter tempo em segundos
 double obter_tempo() {
 #ifdef _WIN32
     LARGE_INTEGER freq, counter;
@@ -46,19 +109,18 @@ double calcular_desvio(double* valores, int n, double media) {
     return sqrt(soma / (n - 1));
 }
 
-// Executa experimento: carrega CSV e mede tempo de ordenação
-// Usa array C puro para comparação justa com Python
 double executar_experimento(const char* caminho_csv) {
     int tamanho;
+    
     int* arr = carregar_csv(caminho_csv, &tamanho);
     if (!arr) return -1.0;
     
-    double t_inicio = obter_tempo();
+    double t_inicio = obter_tempo(); 
     selection_sort(arr, tamanho);
-    double t_fim = obter_tempo();
+    double t_fim = obter_tempo(); 
     
     free(arr);
-    return (t_fim - t_inicio) * 1000.0;  // Retorna em milissegundos
+    return (t_fim - t_inicio) * 1000.0;  // milissegundos
 }
 
 int main(int argc, char* argv[]) {
@@ -66,7 +128,6 @@ int main(int argc, char* argv[]) {
     int num_tamanhos = 10;
     int num_execucoes = 50;
     
-    // Usa tamanhos passados por argumento
     if (argc > 1) {
         num_tamanhos = argc - 1;
         for (int i = 0; i < num_tamanhos; i++) {
@@ -74,7 +135,7 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    printf("EXPERIMENTOS - SELECTION SORT (C)\n");
+    printf("EXPERIMENTOS - SELECTION SORT (C) - APENAS SORT\n");
     
     // Cria diretórios
 #ifdef _WIN32

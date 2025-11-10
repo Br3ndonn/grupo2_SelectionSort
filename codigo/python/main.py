@@ -32,20 +32,15 @@ if __name__ == "__main__":
         writer.writerow(['n', 'tempo_ms', 'desvio'])
         
         for n in tamanhos:
-            print(f"\nProcessando n={n}...")
-            tempos = []
             
+            tempos = []
             for exec in range(1, num_execucoes + 1):
                 caminho = dados_dir / f"n{n:06d}" / f"run_{exec:03d}.csv"
                 tempo = executar_experimento(caminho)
                 tempos.append(tempo)
                 
-                if exec % 10 == 0:
-                    print(f"  {exec}/{num_execucoes}")
-            
             media = statistics.mean(tempos)
             desvio = statistics.stdev(tempos) if len(tempos) > 1 else 0.0
             writer.writerow([n, f"{media:.6f}", f"{desvio:.6f}"])
-            print(f"  Media: {media:.3f} ms, Desvio: {desvio:.3f} ms")
     
     print("\nResultados em: resultados/estatisticas/resultados_Python.csv")
