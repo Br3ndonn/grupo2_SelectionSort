@@ -52,11 +52,11 @@ call codigo\c\build\meu_programa.exe
 
 echo -----------------------------------------
 
-:: ==============================
-:: EXECUTA PYTHON
-:: ==============================
-echo 🔹 Executando o programa Python...
-call python codigo\python\main.py
+@REM :: ==============================
+@REM :: EXECUTA PYTHON
+@REM :: ==============================
+@REM echo 🔹 Executando o programa Python...
+@REM call python codigo\python\main.py
 
 echo =========================================
 echo ✅ EXECUÇÃO COMPLETA!
