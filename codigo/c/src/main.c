@@ -76,21 +76,20 @@ int main(int argc, char* argv[]) {
     
     printf("EXPERIMENTOS - SELECTION SORT (C)\n");
     
-    // Cria diretórios
 #ifdef _WIN32
-    _mkdir("..\\..\\resultados");
-    _mkdir("..\\..\\resultados\\estatisticas");
+    _mkdir("resultados");
+    _mkdir("resultados\\estatisticas");
 #else
-    mkdir("../../resultados", 0777);
-    mkdir("../../resultados/estatisticas", 0777);
+    mkdir("resultados", 0777);
+    mkdir("resultados/estatisticas", 0777);
 #endif
     
-    FILE* resultado = fopen("../../resultados/estatisticas/resultados_C.csv", "w");
-    if (!resultado) {
-        printf("Erro ao criar arquivo\n");
-        return 1;
-    }
-    fprintf(resultado, "n,tempo_ms,desvio\n");
+    FILE* resultado = fopen("resultados/estatisticas/resultados_C.csv", "w");
+if (!resultado) {
+    printf("❌ Erro ao criar arquivo de resultados.\n");
+    return 1;
+}
+fprintf(resultado, "n,tempo_ms,desvio\n");
     
     for (int t = 0; t < num_tamanhos; t++) {
         int n = tamanhos[t];
@@ -101,7 +100,8 @@ int main(int argc, char* argv[]) {
         
         for (int exec = 1; exec <= num_execucoes; exec++) {
             char caminho[256];
-            sprintf(caminho, "../../dados/n%06d/run_%03d.csv", n, exec);
+            sprintf(caminho, "C:\\Users\\Rafael Silveira\\Desktop\\dev-rs\\EADII\\grupo2_SelectionSort\\dados\\n%06d\\run_%03d.csv", n, exec);
+
             
             double tempo = executar_experimento(caminho);
             if (tempo >= 0) tempos[validos++] = tempo;
