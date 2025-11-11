@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Locale;
 
 public class Main {
     
@@ -82,7 +83,10 @@ public class Main {
                     double media = calcularMedia(temposValidos);
                     double desvio = calcularDesvio(temposValidos, media);
                     
-                    writer.printf("%d,%.6f,%.6f%n", n, media, desvio);
+                    // Usa formatação com ponto decimal (Locale.US) para garantir compatibilidade CSV
+                    writer.printf(Locale.US, "%d,%.6f,%.6f%n", n, media, desvio);
+                    
+                    // Exibe no console usando a localização do sistema para melhor legibilidade
                     System.out.printf("  Media: %.3f ms, Desvio: %.3f ms%n", media, desvio);
                 }
             }

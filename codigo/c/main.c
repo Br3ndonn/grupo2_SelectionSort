@@ -1,184 +1,132 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
-#include <time.h>
-
-#ifdef _WIN32
 #include <windows.h>
-#include <direct.h>
-#else
-#include <sys/stat.h>
-#endif
+#include "selection_sort.h"
 
-// --- Prototypes (declarações) seguindo boas práticas ---
-void selection_sort(int* restrict arr, int n);
-int* carregar_csv(const char* caminho, int* tamanho);
-double obter_tempo(void);
-double calcular_media(double* valores, int n);
-double calcular_desvio(double* valores, int n, double media);
-double executar_experimento(const char* caminho_csv);
-
-void selection_sort(int* restrict arr, int n) {
-    for (int i = 0; i < n; i++) {
-        int min_index = i;
-        
-        for (int j = i + 1; j < n; j++) {
-            if (arr[j] < arr[min_index]) {
-                min_index = j;
-            }
-        }
-        
-        if (min_index != i) {
-            int temp = arr[min_index];
-            arr[min_index] = arr[i];
-            arr[i] = temp;
-        }
-    }
-}
-
-int* carregar_csv(const char* caminho, int* tamanho) {
-    FILE* arquivo = fopen(caminho, "rb");
-    if (!arquivo) return NULL;
-    
-    fseek(arquivo, 0, SEEK_END);
-    long file_size = ftell(arquivo);
-    fseek(arquivo, 0, SEEK_SET);
-    
-    char* buffer = (char*)malloc(file_size + 1);
-    if (!buffer) {
-        fclose(arquivo);
+int* ler_csv(const char* caminho, int* tamanho) {
+    FILE* arquivo = fopen(caminho, "r");
+    if (!arquivo) {
+        printf("Erro ao abrir arquivo: %s\n", caminho);
         return NULL;
     }
     
-    size_t bytes_read = fread(buffer, 1, file_size, arquivo);
-    fclose(arquivo);
-    buffer[bytes_read] = '\0';
+    int num, count = 0;
     
-    int count = 1;
-    for (size_t i = 0; i < bytes_read; i++) {
-        if (buffer[i] == ',') count++;
+    /* Contar elementos primeiro */
+    while (fscanf(arquivo, "%d,", &num) == 1) {
+        count++;
     }
     
+    if (count == 0) {
+        fclose(arquivo);
+        *tamanho = 0;
+        return NULL;
+    }
+    
+    /* Alocar tamanho exato */
     int* arr = (int*)malloc(count * sizeof(int));
     if (!arr) {
-        free(buffer);
+        fclose(arquivo);
+        printf("Erro de memoria\n");
         return NULL;
     }
     
-    char* ptr = buffer;
-    for (int i = 0; i < count; i++) {
-        arr[i] = (int)strtol(ptr, &ptr, 10);
-        ptr++;  // Pula vírgula
+    /* Voltar ao inicio e ler valores */
+    rewind(arquivo);
+    int i = 0;
+    while (i < count && fscanf(arquivo, "%d,", &num) == 1) {
+        arr[i++] = num;
     }
     
-    free(buffer);
-    *tamanho = count;
+    fclose(arquivo);
+    *tamanho = i;
     return arr;
 }
 
-// obter tempo em segundos
-double obter_tempo() {
-#ifdef _WIN32
-    LARGE_INTEGER freq, counter;
-    QueryPerformanceFrequency(&freq);
-    QueryPerformanceCounter(&counter);
-    return (double)counter.QuadPart / freq.QuadPart;
-#else
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-    return ts.tv_sec + ts.tv_nsec / 1e9;
-#endif
-}
-
-// Calcula média
 double calcular_media(double* valores, int n) {
     double soma = 0.0;
-    for (int i = 0; i < n; i++) soma += valores[i];
+    int i;
+    for (i = 0; i < n; i++) {
+        soma += valores[i];
+    }
     return soma / n;
 }
 
-// Calcula desvio padrão
 double calcular_desvio(double* valores, int n, double media) {
-    if (n <= 1) return 0.0;
     double soma = 0.0;
-    for (int i = 0; i < n; i++) {
-        double diff = valores[i] - media;
+    double diff;
+    int i;
+    
+    if (n <= 1) return 0.0;
+    
+    for (i = 0; i < n; i++) {
+        diff = valores[i] - media;
         soma += diff * diff;
     }
     return sqrt(soma / (n - 1));
 }
 
-double executar_experimento(const char* caminho_csv) {
-    int tamanho;
-    
-    int* arr = carregar_csv(caminho_csv, &tamanho);
-    if (!arr) return -1.0;
-    
-    double t_inicio = obter_tempo(); 
-    selection_sort(arr, tamanho);
-    double t_fim = obter_tempo(); 
-    
-    free(arr);
-    return (t_fim - t_inicio) * 1000.0;  // milissegundos
-}
-
-int main(int argc, char* argv[]) {
+int main() {
+    int exec, t;
+    LARGE_INTEGER freq, inicio, fim;
+    double tempos[50];
+    double media, desvio;
     int tamanhos[] = {10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000};
     int num_tamanhos = 10;
-    int num_execucoes = 50;
+    FILE* resultado;
     
-    if (argc > 1) {
-        num_tamanhos = argc - 1;
-        for (int i = 0; i < num_tamanhos; i++) {
-            tamanhos[i] = atoi(argv[i + 1]);
-        }
-    }
+    QueryPerformanceFrequency(&freq);
     
-    printf("EXPERIMENTOS - SELECTION SORT (C) - APENAS SORT\n");
-    
-    // Cria diretórios
-#ifdef _WIN32
-    _mkdir("..\\..\\resultados");
-    _mkdir("..\\..\\resultados\\estatisticas");
-#else
-    mkdir("../../resultados", 0777);
-    mkdir("../../resultados/estatisticas", 0777);
-#endif
-    
-    FILE* resultado = fopen("../../resultados/estatisticas/resultados_C.csv", "w");
+    resultado = fopen("../../resultados/estatisticas/resultados_C.csv", "w");
     if (!resultado) {
-        printf("Erro ao criar arquivo\n");
+        printf("Erro ao criar arquivo de resultados\n");
         return 1;
     }
+    
     fprintf(resultado, "n,tempo_ms,desvio\n");
     
-    for (int t = 0; t < num_tamanhos; t++) {
+    for (t = 0; t < num_tamanhos; t++) {
         int n = tamanhos[t];
+        
         printf("\nProcessando n=%d...\n", n);
         
-        double tempos[50];
-        int validos = 0;
-        
-        for (int exec = 1; exec <= num_execucoes; exec++) {
+        for (exec = 1; exec <= 50; exec++) {
             char caminho[256];
+            int tamanho;
+            int* arr;
+            
             sprintf(caminho, "../../dados/n%06d/run_%03d.csv", n, exec);
             
-            double tempo = executar_experimento(caminho);
-            if (tempo >= 0) tempos[validos++] = tempo;
+            arr = ler_csv(caminho, &tamanho);
+            if (!arr) continue;
             
-            if (exec % 10 == 0) printf("  %d/%d\n", exec, num_execucoes);
+            QueryPerformanceCounter(&inicio);
+            selection_sort(arr, tamanho);
+            QueryPerformanceCounter(&fim);
+            
+            tempos[exec - 1] = ((double)(fim.QuadPart - inicio.QuadPart) / freq.QuadPart) * 1000.0;
+            
+            if (exec == 25) {
+                printf("  25/50 concluidos\n");
+            } else if (exec == 50) {
+                printf("  50/50 concluidos\n");
+            }
+            
+            free(arr);
         }
         
-        if (validos > 0) {
-            double media = calcular_media(tempos, validos);
-            double desvio = calcular_desvio(tempos, validos, media);
-            fprintf(resultado, "%d,%.6f,%.6f\n", n, media, desvio);
-            printf("  Media: %.3f ms, Desvio: %.3f ms\n", media, desvio);
-        }
+        media = calcular_media(tempos, 50);
+        desvio = calcular_desvio(tempos, 50, media);
+        
+        printf("  Media: %.6f ms | Desvio: %.6f ms\n", media, desvio);
+        
+        fprintf(resultado, "%d,%.6f,%.6f\n", n, media, desvio);
     }
     
     fclose(resultado);
-    printf("\nResultados em: resultados/estatisticas/resultados_C.csv\n");
+    
+    printf("\nResultados salvos em: resultados/estatisticas/resultados_C.csv\n");
+    
     return 0;
 }
