@@ -23,8 +23,8 @@ def gerar_grafico(df, titulo, arquivo_saida):
     """Gera gráfico log-log de desempenho para uma linguagem."""
     plt.figure(figsize=(8, 5))
     plt.plot(df["n"], df["tempo_ms"], marker='o', linestyle='-', color='steelblue')
-    plt.xscale("log")
-    plt.yscale("log")
+    # plt.xscale("log")
+    # plt.yscale("log")
     plt.title(titulo)
     plt.xlabel("Tamanho do vetor (n)")
     plt.ylabel("Tempo médio (ms)")
@@ -39,8 +39,8 @@ def gerar_comparativo(dados):
     plt.figure(figsize=(8, 5))
     for nome, df in dados.items():
         plt.plot(df["n"], df["tempo_ms"], marker='o', linestyle='-', label=nome)
-    plt.xscale("log")
-    plt.yscale("log")
+    # plt.xscale("quadratic")
+    # plt.yscale("quadratic")
     plt.title("Comparativo de Desempenho - Selection Sort")
     plt.xlabel("Tamanho do vetor (n)")
     plt.ylabel("Tempo médio (ms)")

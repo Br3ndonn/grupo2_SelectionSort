@@ -7,19 +7,19 @@ echo =========================================
 :: ==============================
 :: COMPILA JAVA
 :: ==============================
-echo 🔹 Compilando o projeto Java...
+echo Compilando o projeto Java...
 javac -d codigo\java\out codigo\java\src\*.java
 
 if %errorlevel% neq 0 (
-    echo ❌ Erro na compilação Java!
+    echo Erro na compilação Java!
     pause
     exit /b %errorlevel%
 )
 
-echo ✅ Compilação Java concluída com sucesso!
+echo Compilação Java concluída com sucesso!
 echo -----------------------------------------
 
-echo ▶️ Executando o programa Java...
+echo ▶Executando o programa Java...
 call java -cp codigo\java\out Main
 
 echo -----------------------------------------
@@ -36,29 +36,30 @@ gcc codigo\c\src\main.c ^
     codigo\c\src\lista.c ^
     codigo\c\src\carrega_csv.c ^
     -I codigo\c\include ^
+    -O3 -march=native -ffast-math -funroll-loops ^
     -o codigo\c\build\meu_programa.exe
 
 if %errorlevel% neq 0 (
-    echo ❌ Erro na compilação C!
+    echo erro na compilação C!
     pause
     exit /b %errorlevel%
 )
 
-echo ✅ Compilação C concluída com sucesso!
+echo Compilação C concluída com sucesso!
 echo -----------------------------------------
 
-echo ▶️ Executando o programa C...
+echo ▶Executando o programa C...
 call codigo\c\build\meu_programa.exe
 
 echo -----------------------------------------
 
-@REM :: ==============================
-@REM :: EXECUTA PYTHON
-@REM :: ==============================
-@REM echo 🔹 Executando o programa Python...
-@REM call python codigo\python\main.py
+:: ==============================
+:: EXECUTA PYTHON
+:: ==============================
+echo Executando o programa Python...
+call python codigo\python\main.py
 
 echo =========================================
-echo ✅ EXECUÇÃO COMPLETA!
+echo EXECUÇÃO COMPLETA!
 echo =========================================
 pause

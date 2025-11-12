@@ -4,14 +4,6 @@ import csv
 from pathlib import Path
 
 def gerar_dados():
-    """
-    Gera arquivos CSV com vetores de inteiros para teste do Selection Sort
-    
-    - Tamanhos: 10.000 até 100.000 (incremento de 10.000)
-    - 50 execuções por tamanho
-    - Seeds únicas para cada execução
-    """
-    # Diretório base sempre dentro do projeto, ao lado da pasta 'codigo'
     base_dir = Path(__file__).resolve().parents[2] / "dados"
     base_dir.mkdir(parents=True, exist_ok=True)
     print(f"Saída base: {base_dir}")
