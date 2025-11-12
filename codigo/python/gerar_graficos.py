@@ -28,6 +28,7 @@ def gerar_grafico(df, titulo, arquivo_saida):
     plt.title(titulo)
     plt.xlabel("Tamanho do vetor (n)")
     plt.ylabel("Tempo médio (ms)")
+    plt.legend()
     plt.grid(True, which="both", linestyle="--", linewidth=0.5)
     plt.tight_layout()
     plt.savefig(arquivo_saida, dpi=300)
@@ -36,7 +37,12 @@ def gerar_grafico(df, titulo, arquivo_saida):
 
 def gerar_comparativo(dados):
     """Gera um gráfico comparativo entre as três linguagens."""
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(10, 6))
+    
+    # Define cores para cada linguagem
+    cores = {'C': 'blue', 'Java': 'orange', 'Python': 'green'}
+    
+    # Plota dados de cada linguagem com sombra de desvio
     for nome, df in dados.items():
         plt.plot(df["n"], df["tempo_ms"], marker='o', linestyle='-', label=nome)
     # plt.xscale("quadratic")
@@ -51,6 +57,54 @@ def gerar_comparativo(dados):
     plt.savefig(saida, dpi=300)
     plt.close()
     print(f"✅ Gráfico comparativo salvo em {saida}")
+
+def gerar_razao_crescimento(dados):
+    """Gera gráfico comparando razão de crescimento empírica vs teórica O(n²)."""
+    plt.figure(figsize=(10, 6))
+    
+    # Define cores para cada linguagem
+    cores = {'C': 'blue', 'Java': 'orange', 'Python': 'green'}
+    
+    # Para cada linguagem, calcula a razão de crescimento
+    for nome, df in dados.items():
+        if len(df) < 2:
+            continue
+            
+        cor = cores.get(nome, 'gray')
+        n_values = df["n"].values
+        tempo_values = df["tempo_ms"].values
+        
+        # Calcula razão de crescimento empírica: T(n) / T(n0)
+        # Normaliza pelo primeiro valor
+        n0 = n_values[0]
+        t0 = tempo_values[0]
+        razao_empirica = tempo_values / t0
+        
+        # Plota razão empírica
+        plt.plot(n_values, razao_empirica, marker='o', linestyle='-', 
+                color=cor, label=f'{nome} (empírico)', linewidth=2)
+    
+    # Calcula e plota razão teórica O(n²): (n/n0)²
+    primeiro_df = list(dados.values())[0]
+    n_values = primeiro_df["n"].values
+    n0 = n_values[0]
+    razao_teorica = (n_values / n0) ** 2
+    
+    plt.plot(n_values, razao_teorica, linestyle='--', color='black', 
+            alpha=0.7, linewidth=3, label='O(n²) teórico')
+    
+    plt.xscale("log")
+    plt.yscale("log")
+    plt.title("Validação Empírica da Complexidade O(n²)\nRazão de Crescimento: T(n)/T(n₀)")
+    plt.xlabel("Tamanho do vetor (n)")
+    plt.ylabel("Razão de crescimento (normalizado)")
+    plt.legend()
+    plt.grid(True, which="both", linestyle="--", linewidth=0.5)
+    plt.tight_layout()
+    saida = os.path.join(GRAF_DIR, "razao_crescimento_empirico_vs_teorico.png")
+    plt.savefig(saida, dpi=300)
+    plt.close()
+    print(f"✅ Gráfico de razão de crescimento salvo em {saida}")
 
 def main():
     arquivos = {
@@ -73,6 +127,9 @@ def main():
 
     if len(dados) >= 2:
         gerar_comparativo(dados)
+    
+    if len(dados) >= 1:
+        gerar_razao_crescimento(dados)
 
 if __name__ == "__main__":
     main()
